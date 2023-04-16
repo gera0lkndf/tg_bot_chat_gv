@@ -34,6 +34,7 @@ def main():
     application.add_handler(CommandHandler("help", help_command))
 
     application.add_handler(text_handler)
+
     application.run_polling()
 
 
