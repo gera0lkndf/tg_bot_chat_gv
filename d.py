@@ -1,8 +1,7 @@
 from telegram.ext import Application, MessageHandler, filters, CommandHandler
-from config import BOT_TOKEN
 from telegram import ReplyKeyboardMarkup
 
-
+BOT_TOKEN = "6292774773:AAFjVKc7h3YxwOoEDfh67nyBv_E-VyaKHYE"
 reply_keyboard = [['/start', '/help']]
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
 
@@ -18,6 +17,7 @@ async def user_message(update, context):
     with open('all_messages.txt', 'a', encoding='utf-8') as file:
         user = update.message.from_user.username
         text = update.message.text
+        print(1)
         file.write(f"@{user}: {text}\n")
 
 
