@@ -62,6 +62,7 @@ def main():
     )
 
     application.add_handler(conv_handler)
+    application.add_handler(CommandHandler("start", start_command))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CallbackQueryHandler(button))
 
