@@ -12,7 +12,7 @@ FIRST, SECOND = range(2)
 
 async def start_command(update, context):
     user = update.message.from_user.username
-    await update.message.reply_html(f'Привет {user}!!! Нажми /post, чтобы создать пост.', reply_markup=markup)
+    await update.message.reply_html(f'Привет {user}! Нажми /post, чтобы создать пост.', reply_markup=markup)
     return FIRST
 
 
