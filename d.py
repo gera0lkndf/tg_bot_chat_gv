@@ -4,31 +4,40 @@ from telegram.ext import CallbackQueryHandler, CommandHandler, ConversationHandl
 BOT_TOKEN = "6292774773:AAHQnhCfZpJFNjJ5y9xFWaHpkII3f2HQ07c"
 
 
-reply_keyboard = [['/post', '/help']]
-markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
-
-
 FIRST, SECOND = range(2)
+
+MAP = {"спальня": {"img": "img.png",
+                   "txt": "вы проснулись в спальне, вам плохо, зато в руках плата",
+                   "actions": ["ванная комната", "кухня"]},
+       "ванная комната": {"img": "img1.jpg",
+                          "txt": "обычная не очень ухоженная ванная комната. маленький умывальник, зеркало и унитаз.",
+                          "actions": ["спальня"]},
+       "кухня": {"img": "img2.jpg",
+                 "txt": "на кухне мышь повесилась, да и ту съели",
+                 "actions": ["спальня"]}}
+
+users = {}
 
 
 async def start_command(update, context):
     user = update.message.from_user.username
-    await update.message.reply_html(f'Привет {user}! Нажми /post, чтобы создать пост.', reply_markup=markup)
+    users[user] = "спальня"
+    await update.message.reply_html(f'Привет {user}! Нажми /start_game, чтобы создать пост.')
     return FIRST
 
 
 async def help_command(update, context):
     user = update.message.from_user.username
-    await update.message.reply_text(f"Привет {user}!", reply_markup=markup)
+    await update.message.reply_text(f"Привет {user}!")
     keyboard = [[InlineKeyboardButton("start", callback_data='a'),
                  InlineKeyboardButton("stop", callback_data='b')]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
 
 async def game(update, context):
-    keyboard = [[InlineKeyboardButton("Выйти в правый корридор", callback_data='button1'),
-                 InlineKeyboardButton("Зайти в левый корридор", callback_data='button2'),
-                 InlineKeyboardButton("Изучить дверь", callback_data='button3')]]
+    keyboard = [[InlineKeyboardButton("Выйти в правый корридор", callback_data='button1')],
+                [InlineKeyboardButton("Зайти в левый корридор", callback_data='button2')],
+                [InlineKeyboardButton("Изучить дверь", callback_data='button3')]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     with open('img.png', 'rb') as photo:
@@ -39,12 +48,16 @@ async def game(update, context):
 
 
 async def button(update, context):
+    user = update.message.from_user.username
     query = update.callback_query
-    await query.answer()
+    print(query)
+    if query:
+        await query.answer()
+        users[user] = query.data
 
-    keyboard = [[InlineKeyboardButton("Выйти в правый корридор", callback_data='button1'),
-                 InlineKeyboardButton("Выйти в левый корридор", callback_data='button2'),
-                 InlineKeyboardButton("Изучить дверь", callback_data='button3')]]
+    keyboard = [[InlineKeyboardButton("Выйти в правый корридор", callback_data='button1')],
+                [InlineKeyboardButton("Выйти в левый корридор", callback_data='button2')],
+                [InlineKeyboardButton("Изучить дверь", callback_data='button3')]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     if query.data == 'button1':
@@ -75,7 +88,7 @@ def main():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start_command)],
         states={
-            FIRST: [CommandHandler('start_game', game)],
+            FIRST: [CommandHandler('start_game', button)],
             SECOND: []
         },
         fallbacks=[]
@@ -84,7 +97,7 @@ def main():
     application.add_handler(conv_handler)
     text_handler = MessageHandler(filters.TEXT, user_message)
     application.add_handler(CommandHandler("start", start_command))
-    application.add_handler(CommandHandler("help", help_command))
+    # application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CallbackQueryHandler(button))
     application.add_handler(text_handler)
     application.run_polling()
