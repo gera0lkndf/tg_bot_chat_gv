@@ -3,18 +3,7 @@ from telegram.ext import CallbackQueryHandler, CommandHandler, ConversationHandl
 
 BOT_TOKEN = "6292774773:AAHQnhCfZpJFNjJ5y9xFWaHpkII3f2HQ07c"
 
-
 FIRST, SECOND = range(2)
-
-MAP = {"спальня": {"img": "img.png",
-                   "txt": "вы проснулись в спальне, вам плохо, зато в руках плата",
-                   "actions": ["ванная комната", "кухня"]},
-       "ванная комната": {"img": "img1.jpg",
-                          "txt": "обычная не очень ухоженная ванная комната. маленький умывальник, зеркало и унитаз.",
-                          "actions": ["спальня"]},
-       "кухня": {"img": "img2.jpg",
-                 "txt": "на кухне мышь повесилась, да и ту съели",
-                 "actions": ["спальня"]}}
 
 users = {}
 
