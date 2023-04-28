@@ -136,7 +136,6 @@ async def button(update, context):
         with open(MAP["шаверма"]["img"], 'rb') as photo:
             await context.bot.send_photo(chat_id=query.message.chat_id, photo=photo, caption=MAP["шаверма"]["txt"],
                                          reply_markup=reply_markup)
-
     return FIRST
 
 
