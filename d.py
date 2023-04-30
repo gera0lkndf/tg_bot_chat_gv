@@ -6,12 +6,13 @@ BOT_TOKEN = "6292774773:AAHQnhCfZpJFNjJ5y9xFWaHpkII3f2HQ07c"
 
 FIRST, SECOND = range(2)
 
-users = {}
+ismagnet = False
+iskeys = False
+
 
 
 async def start_command(update, context):
     user = update.message.from_user.username
-    users[user] = "спальня"
     await update.message.reply_html(f'Привет {user}! Нажми /start_game, чтобы создать пост.')
     return FIRST
 
@@ -28,12 +29,12 @@ async def game(update, context):
 
 
 async def button(update, context):
+    global ismagnet, iskeys
     user = update.callback_query.from_user.username
     query = update.callback_query
 
     if query:
         await query.answer()
-        users[user] = query.data
 
     if query.message and query.data == 'button_bedroom':
         keyboard = [[InlineKeyboardButton(MAP["спальня"]["actions"][0], callback_data='button_bathroom')],
@@ -46,25 +47,50 @@ async def button(update, context):
     if query.message and query.data == 'button_bathroom':
         keyboard = [[InlineKeyboardButton(MAP["ванная комната"]["actions"][0], callback_data='button_bedroom')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        with open(MAP["ванная комната"]["img"], 'rb') as photo:
-            await context.bot.send_photo(chat_id=query.message.chat_id, photo=photo,
-                                         caption=MAP["ванная комната"]["txt"], reply_markup=reply_markup)
+        if ismagnet:
+            with open(MAP["ванная комната"]["img"], 'rb') as photo:
+                await context.bot.send_photo(chat_id=query.message.chat_id, photo=photo,
+                                             caption=MAP["ванная комната"]["txt_magnit"], reply_markup=reply_markup)
+                iskeys = True
+        elif iskeys:
+            with open(MAP["ванная комната"]["img"], 'rb') as photo:
+                await context.bot.send_photo(chat_id=query.message.chat_id, photo=photo,
+                                             caption=MAP["ванная комната"]["txt_iskeys"], reply_markup=reply_markup)
+        else:
+            with open(MAP["ванная комната"]["img"], 'rb') as photo:
+                await context.bot.send_photo(chat_id=query.message.chat_id, photo=photo,
+                                             caption=MAP["ванная комната"]["txt"], reply_markup=reply_markup)
 
     if query.message and query.data == 'button_kitchen':
         keyboard = [[InlineKeyboardButton(MAP["кухня"]["actions"][0], callback_data='button_bedroom')],
                     [InlineKeyboardButton(MAP["кухня"]["actions"][1], callback_data='button_entrance')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        with open(MAP["кухня"]["img"], 'rb') as photo:
-            await context.bot.send_photo(chat_id=query.message.chat_id, photo=photo, caption=MAP["кухня"]["txt"],
-                                         reply_markup=reply_markup)
+        if ismagnet:
+            with open(MAP["кухня"]["img"], 'rb') as photo:
+                await context.bot.send_photo(chat_id=query.message.chat_id, photo=photo, caption=MAP["кухня"]["txt_has_magnet"],
+                                             reply_markup=reply_markup)
+        else:
+            with open(MAP["кухня"]["img"], 'rb') as photo:
+                await context.bot.send_photo(chat_id=query.message.chat_id, photo=photo, caption=MAP["кухня"]["txt"],
+                                             reply_markup=reply_markup)
+                ismagnet = True
+    if iskeys:
+        if query.message and query.data == 'button_entrance':
+            keyboard = [[InlineKeyboardButton(MAP["подъезд"]["actions"][0], callback_data='button_entrance_up')],
+                        [InlineKeyboardButton(MAP["подъезд"]["actions"][1], callback_data='button_entrance_down')]]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            with open(MAP["подъезд"]["img"], 'rb') as photo:
+                await context.bot.send_photo(chat_id=query.message.chat_id, photo=photo, caption=MAP["подъезд"]["txt"],
+                                             reply_markup=reply_markup)
+    else:
+        if query.message and query.data == 'button_entrance':
+            keyboard = [[InlineKeyboardButton(MAP["кухня"]["actions"][0], callback_data='button_bedroom')],
+                        [InlineKeyboardButton(MAP["кухня"]["actions"][1], callback_data='button_entrance')]]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            with open(MAP["подъезд"]["img_nokeys"], 'rb') as photo:
+                await context.bot.send_photo(chat_id=query.message.chat_id, photo=photo, caption=MAP["подъезд"]["txt_nokeys"],
+                                             reply_markup=reply_markup)
 
-    if query.message and query.data == 'button_entrance':
-        keyboard = [[InlineKeyboardButton(MAP["подъезд"]["actions"][0], callback_data='button_entrance_up')],
-                    [InlineKeyboardButton(MAP["подъезд"]["actions"][1], callback_data='button_entrance_down')]]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        with open(MAP["подъезд"]["img"], 'rb') as photo:
-            await context.bot.send_photo(chat_id=query.message.chat_id, photo=photo, caption=MAP["подъезд"]["txt"],
-                                         reply_markup=reply_markup)
 
     if query.message and query.data == 'button_entrance_up':
         keyboard = [[InlineKeyboardButton(MAP["наверх"]["actions"][0], callback_data='button_red')],
